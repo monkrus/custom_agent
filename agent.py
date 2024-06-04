@@ -22,8 +22,35 @@ def fetch_github(owner, repo, endpoint):
     print(data)
     return data
 
-owner = "Ebazhanov"
-repo = "linkedin-skill-assessments-quizzes"
-endpoint = "issues"
+# to test the fetch_github function is working correctly
+# owner = "Ebazhanov"
+# repo = "linkedin-skill-assessments-quizzes"
+# endpoint = "issues"
+# fetch_github(owner, repo, endpoint)
 
-fetch_github(owner, repo, endpoint)
+
+def fetch_github_issues(owner, repo):
+    data = fetch_github(owner, repo, "issues")
+    return load_issues(data)
+
+
+def load_issues(issues):
+    docs = []
+    for entry in issues:
+        metadata = {
+            "author": entry["user"]["login"],
+            "comments": entry["comments"],
+            "body": entry["body"],
+            "labels": entry["labels"],
+            "created_at": entry["created_at"],
+            "updated_at": entry["updated_at"],  
+            "state": entry["state"],  
+            "reactions": entry["reactions"] if "reactions" in entry else {},
+        }
+        data = entry["title"]
+        if entry["body"]:
+            data += entry["body"]
+        doc = Document(page_content=data, metadata=metadata)
+        docs.append(doc)
+
+    return docs
